@@ -1,4 +1,4 @@
-# Second-order Convergence Properties of Random Search Methods
+# pySORS
 
 Fork of https://github.com/adamsolomou/second-order-random-search, which implements algorithms described in:
 > Aurelien Lucchi, Antonio Orvieto, Adamos Solomou. [On the Second-order Convergence Properties of Random Search Methods](https://arxiv.org/abs/2110.13265). In Neural Information Processing Systems (NeurIPS), 2021.
