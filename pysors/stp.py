@@ -21,6 +21,7 @@ from .utils import SecondOrderRandomSearchOptimizer
 
 
 class STP(SecondOrderRandomSearchOptimizer):
+    """Stochastic Three Points"""
     def __init__(self, a_init = 0.25, step_upd='half', distribution:Literal['Uniform', 'Normal']='Uniform', T_half = 10,):
         super().__init__()
         self.a = a_init

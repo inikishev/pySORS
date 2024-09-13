@@ -146,107 +146,127 @@ def _DFPI_FD(f, y, c, T_power):
 
 
 class RSPI_SPSA(SecondOrderRandomSearchOptimizer):
-    def __init__(
-        self,
-        a_init=0.25,
-        c_init=0.1,
-        beta=0.101,
-        sigma_1=0.5,
-        sigma_2=0.25,
-        distribution="Normal",
-        step_upd="half",
-        theta=0.6,
-        T_half=10,
-        T_power=100,
-    ):
-        super().__init__()
-        self.a = a_init
-        self.c = c_init
-        self.a_init = a_init
-        self.c_init = c_init
-        self.beta = beta
-        self.sigma_1 = sigma_1
-        self.sigma_2 = sigma_2
-        self.distribution = distribution
-        self.step_upd = step_upd
-        self.theta = theta
-        self.T_half = T_half
-        self.T_power = T_power
+	"""Power Iteration Random Search with SPSA hessian estimation"""
+	def __init__(
+		self,
+		a_init=0.25,
+		c_init=0.1,
+		beta=0.101,
+		sigma_1=0.5,
+		sigma_2=0.25,
+		distribution="Normal",
+		step_upd="half",
+		theta=0.6,
+		T_half=10,
+		T_power=100,
+	):
+		super().__init__()
+		self.a = a_init
+		self.c = c_init
+		self.a_init = a_init
+		self.c_init = c_init
+		self.beta = beta
+		self.sigma_1 = sigma_1
+		self.sigma_2 = sigma_2
+		self.distribution = distribution
+		self.step_upd = step_upd
+		self.theta = theta
+		self.T_half = T_half
+		self.T_power = T_power
 
-        self.t = 1
+		self.t = 1
 
-    def step(self, f: Callable[[np.ndarray], float], x: np.ndarray) -> np.ndarray:
-        self._initialize(f, x)
+	def step(self, f: Callable[[np.ndarray], float], x: np.ndarray) -> np.ndarray:
+		"""Perform one optimization step
 
-        # Initialization
-        y = x.flatten()  # iterate @ t
+		:param f: function that takes in and array of same shape as `x` and outputs a scalar value.
+		:param x: Current parameters.
+		:return: `x` new parameters.
 
-        # """ ========= Random Step ========= """
-        if self.distribution == "Uniform":
-            d1 = np.random.multivariate_normal(np.zeros(self.d), np.identity(self.d))
-            d1 = self.sigma_1 * (d1 / np.linalg.norm(d1))
-        elif self.distribution == "Normal":
-            d1 = np.random.multivariate_normal(
-                np.zeros(self.d), np.power(self.sigma_1, 2.0) * np.identity(self.d)
-            )
-        else:
-            raise ValueError(
-                f"The option {self.distribution} is not a supported sampling distribution."
-            )
+		example:
+		```py
+		x = np.array([-3., -4.])
+		opt = pysors.BDS()
 
-        V = [y, y + self.a * d1, y - self.a * d1]
+		for i in range(1000):
+			x = opt.step(rosenbrock, x)
 
-        f_v = []
-        for v in V:
-            f_v.append(self.eval(v))
+		print(x) # last solution array
+		print(rosenbrock(x)) # objective value at x
+		```
+		"""
+		self._initialize(f, x)
 
-        # Select optimal point
-        i_star = np.argmin(np.array(f_v))
+		# Initialization
+		y = x.flatten()  # iterate @ t
 
-        # Update iterate
-        y = V[i_star]
+		# """ ========= Random Step ========= """
+		if self.distribution == "Uniform":
+			d1 = np.random.multivariate_normal(np.zeros(self.d), np.identity(self.d))
+			d1 = self.sigma_1 * (d1 / np.linalg.norm(d1))
+		elif self.distribution == "Normal":
+			d1 = np.random.multivariate_normal(
+				np.zeros(self.d), np.power(self.sigma_1, 2.0) * np.identity(self.d)
+			)
+		else:
+			raise ValueError(
+				f"The option {self.distribution} is not a supported sampling distribution."
+			)
 
-        # """ ========= Negative Curvature ========= """
-        if i_star == 0:
-            d2 = _DFPI_SPSA(self, y, self.c, self.beta, self.T_power)
+		V = [y, y + self.a * d1, y - self.a * d1]
 
-            while d2 is None:
-                d2 = _DFPI_SPSA(self, y, self.c, self.beta, self.T_power)
+		f_v = []
+		for v in V:
+			f_v.append(self.eval(v))
 
-            # """ ========= Update Step ========= """
-            V = [y, y + self.sigma_2 * d2, y - self.sigma_2 * d2]
+		# Select optimal point
+		i_star = np.argmin(np.array(f_v))
 
-            f_v = []
-            for v in V:
-                f_v.append(self.eval(v))
+		# Update iterate
+		y = V[i_star]
 
-            # Select optimal point
-            i_star = np.argmin(np.array(f_v))
+		# """ ========= Negative Curvature ========= """
+		if i_star == 0:
+			d2 = _DFPI_SPSA(self, y, self.c, self.beta, self.T_power)
 
-            # Update iterate
-            y = V[i_star]
+			while d2 is None:
+				d2 = _DFPI_SPSA(self, y, self.c, self.beta, self.T_power)
 
-        # Decrease SPSA parameter
-        self.c = self.c_init / pow(self.t, self.beta)
+			# """ ========= Update Step ========= """
+			V = [y, y + self.sigma_2 * d2, y - self.sigma_2 * d2]
 
-        # Update step-size
-        if self.step_upd == "half":
-            if self.t % self.T_half == 0:
-                self.a = self.theta * self.a
-        elif self.step_upd == "inv":
-            self.a = self.a_init / (self.t + 1)
-        elif self.step_upd == "inv_sqrt":
-            self.a = self.a_init / np.sqrt(self.t + 1)
-        else:
-            raise ValueError(
-                f"The option {self.step_upd} is not a supported step size update rule."
-            )
+			f_v = []
+			for v in V:
+				f_v.append(self.eval(v))
 
-        self.t += 1
-        return y.reshape(x.shape)
+			# Select optimal point
+			i_star = np.argmin(np.array(f_v))
+
+			# Update iterate
+			y = V[i_star]
+
+		# Decrease SPSA parameter
+		self.c = self.c_init / pow(self.t, self.beta)
+
+		# Update step-size
+		if self.step_upd == "half":
+			if self.t % self.T_half == 0:
+				self.a = self.theta * self.a
+		elif self.step_upd == "inv":
+			self.a = self.a_init / (self.t + 1)
+		elif self.step_upd == "inv_sqrt":
+			self.a = self.a_init / np.sqrt(self.t + 1)
+		else:
+			raise ValueError(
+				f"The option {self.step_upd} is not a supported step size update rule."
+			)
+
+		self.t += 1
+		return y.reshape(x.shape)
 
 
 class RSPI_FD(SecondOrderRandomSearchOptimizer):
+	"""Power Iteration Random Search"""
 	def __init__(
 		self,
 		a_init=0.25,

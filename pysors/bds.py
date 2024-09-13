@@ -21,6 +21,7 @@ from .utils import SecondOrderRandomSearchOptimizer, _rho, uniform_angles_pss
 
 
 class BDS(SecondOrderRandomSearchOptimizer):
+    """Basic Direct Search"""
     def __init__(self, a_init = 0.25, a_max = 10., theta  = 0.9, gamma = 1.1, rho = _rho):
         super().__init__()
         self.a = a_init
