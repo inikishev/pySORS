@@ -23,6 +23,14 @@ from .utils import SecondOrderRandomSearchOptimizer, _rho, uniform_angles_pss
 class BDS(SecondOrderRandomSearchOptimizer):
     """Basic Direct Search"""
     def __init__(self, a_init = 0.25, a_max = 10., theta  = 0.9, gamma = 1.1, rho = _rho):
+        """Basic Direct Search.
+
+        :param a_init: Initial step size, defaults to 0.25
+        :param a_max: Maximum step size, defaults to 10.
+        :param theta: Multiplier to step size on each unsuccessful step, defaults to 0.9
+        :param gamma: Multiplier to step size on each successful step, defaults to 1.1
+        :param rho: defaults to _rho (not sure what is is)
+        """
         super().__init__()
         self.a = a_init
         self.a_init = a_init

@@ -154,12 +154,25 @@ class RSPI_SPSA(SecondOrderRandomSearchOptimizer):
 		beta=0.101,
 		sigma_1=0.5,
 		sigma_2=0.25,
-		distribution="Normal",
-		step_upd="half",
+        distribution:Literal['Uniform', 'Normal']='Normal',
+        step_upd: Literal['half', 'inv', 'inv_sqrt']="half",
 		theta=0.6,
 		T_half=10,
 		T_power=100,
 	):
+		"""Power Iteration Random Search with SPSA hessian estimation.
+
+		:param a_init: Initial step size, defaults to 0.25
+		:param c_init: Initial petrubation size for hessian estimation, defaults to 0.1
+		:param beta: defaults to 0.101
+		:param sigma_1: defaults to 0.5
+		:param sigma_2: defaults to 0.25
+        :param distribution: Random petrubation distribution, "Normal" or "Uniform", defaults to "Normal"
+        :param step_upd: Step update rule, defaults to "half"
+        :param theta: Multiplier to step size on every `T_half` steps if `step_upd = "half"`, defaults to 0.6
+        :param T_half: Multiply step size by `theta` every `T_half` steps if `step_upd = "half"`, defaults to 10
+		:param T_power: defaults to 100
+		"""
 		super().__init__()
 		self.a = a_init
 		self.c = c_init
@@ -177,24 +190,6 @@ class RSPI_SPSA(SecondOrderRandomSearchOptimizer):
 		self.t = 1
 
 	def step(self, f: Callable[[np.ndarray], float], x: np.ndarray) -> np.ndarray:
-		"""Perform one optimization step
-
-		:param f: function that takes in and array of same shape as `x` and outputs a scalar value.
-		:param x: Current parameters.
-		:return: `x` new parameters.
-
-		example:
-		```py
-		x = np.array([-3., -4.])
-		opt = pysors.BDS()
-
-		for i in range(1000):
-			x = opt.step(rosenbrock, x)
-
-		print(x) # last solution array
-		print(rosenbrock(x)) # objective value at x
-		```
-		"""
 		self._initialize(f, x)
 
 		# Initialization
@@ -274,12 +269,25 @@ class RSPI_FD(SecondOrderRandomSearchOptimizer):
 		beta=0.101,
 		sigma_1=0.5,
 		sigma_2=0.25,
-		distribution="Normal",
-		step_upd="half",
+        distribution:Literal['Uniform', 'Normal']='Normal',
+        step_upd: Literal['half', 'inv', 'inv_sqrt']="half",
 		theta=0.6,
 		T_half=10,
 		T_power=100,
 	):
+		"""Power Iteration Random Search.
+
+		:param a_init: Initial step size, defaults to 0.25
+		:param c_init: Initial petrubation size for hessian estimation, defaults to 0.1
+		:param beta: defaults to 0.101
+		:param sigma_1: defaults to 0.5
+		:param sigma_2: defaults to 0.25
+        :param distribution: Random petrubation distribution, "Normal" or "Uniform", defaults to "Normal"
+        :param step_upd: Step update rule, defaults to "half"
+        :param theta: Multiplier to step size on every `T_half` steps if `step_upd = "half"`, defaults to 0.6
+        :param T_half: Multiply step size by `theta` every `T_half` steps if `step_upd = "half"`, defaults to 10
+		:param T_power: defaults to 100
+		"""
 		super().__init__()
 		self.a = a_init
 		self.c = c_init

@@ -23,6 +23,14 @@ from .utils import SecondOrderRandomSearchOptimizer, _rho, uniform_angles_pss
 class AHDS(SecondOrderRandomSearchOptimizer):
     """Approximate Hessian Direct Search"""
     def __init__(self, a_init = 0.25, a_max = 10., theta  = 0.9, gamma = 1.1, rho = _rho):
+        """Approximate Hessian Direct Search.
+
+        :param a_init: Initial step size, defaults to 0.25
+        :param a_max: Max step size, defaults to 10.
+        :param theta: Multiplier to step size on each unsuccessful step, defaults to 0.9
+        :param gamma: Multiplier to step size on each successful step, defaults to 1.1
+        :param rho: Defaults to _rho (not sure what is is)
+        """
         super().__init__()
         self.a = a_init
         self.a_init = a_init

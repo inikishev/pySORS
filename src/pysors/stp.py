@@ -22,12 +22,29 @@ from .utils import SecondOrderRandomSearchOptimizer
 
 class STP(SecondOrderRandomSearchOptimizer):
     """Stochastic Three Points"""
-    def __init__(self, a_init = 0.25, step_upd='half', distribution:Literal['Uniform', 'Normal']='Uniform', T_half = 10,):
+
+    def __init__(
+        self,
+        a_init=0.25,
+        step_upd: Literal['half', 'inv', 'inv_sqrt']="half",
+        distribution: Literal["Uniform", "Normal"] = "Uniform",
+        theta: float = 0.5,
+        T_half=10,
+    ):
+        """Stochastic Three Points.
+
+        :param a_init: Initial step size, defaults to 0.25
+        :param step_upd: Step update rule, defaults to "half"
+        :param distribution: Random petrubation distribution, "Normal" or "Uniform", defaults to "Normal"
+        :param theta: Multiplier to step size on every `T_half` steps if `step_upd = "half"`, defaults to 0.5
+        :param T_half: Multiply step size by `theta` every `T_half` steps if `step_upd = "half"`, defaults to 10
+        """
         super().__init__()
         self.a = a_init
         self.a_init = a_init
         self.step_upd = step_upd
         self.distribution = distribution
+        self.theta = theta
         self.T_half = T_half
 
         self.t = 1
@@ -62,7 +79,7 @@ class STP(SecondOrderRandomSearchOptimizer):
         # Step size update
         if self.step_upd == 'half':
             if self.t%self.T_half == 0:
-                self.a = self.a/2
+                self.a = self.a * self.theta
         elif self.step_upd == 'inv':
             self.a = self.a_init/(self.t+1)
         elif self.step_upd == 'inv_sqrt':

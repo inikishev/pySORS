@@ -79,8 +79,10 @@ class _Function:
 
 
 class Result:
+    """Result of optimization. Important attributes are `x` - solution array, and `value` - value of objective function at `x`."""
     def __init__(self, objective: _Function, niter: int):
         self.time_passed = time.time() - objective.start_time
+        """Time passed since start of optimization"""
         self.x = objective.x
         """Solution array."""
         self.nfun = objective.nfun
@@ -118,6 +120,25 @@ def minimize(
     :param allow_no_stop: If True, won't raise an exception when no stopping condition is specified. Note that this means the minimization will run forever, unless you manually stop it. Defaults to False
     :param callbacks: Function or sequence of functions that take in array and objective value at that array: `callback(x: np.ndarray, f(x): float)`.
     :return: Result of optimization. Important attributes are `x` - solution array, and `value` - value of objective function at `x`.
+
+
+    example:
+    ```py
+    import pysors
+    import numpy as np
+
+    def rosenbrock(arr):
+        x,y = arr
+        a = 1
+        b = 100
+        return (a - x) ** 2 + b * (y - x ** 2) ** 2
+
+    x0 = np.array([-3., -4.])
+    res = pysors.minimize(rosenbrock, x0 = x0, method = 'bds', stopval=1e-8)
+
+    print(res) # - optimization result, holds `x`, `value` attributes
+    print(res.x) # - solution array.
+    ```
     """
     # check that there is a stopping condition
     if (not allow_no_stop) and all(i is None for i in [maxfun, maxiter, maxtime, stopval, max_no_improve]):

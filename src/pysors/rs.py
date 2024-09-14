@@ -27,25 +27,25 @@ class RS(SecondOrderRandomSearchOptimizer):
         a_init=0.25,
         sigma_1=0.5,
         sigma_2=0.25,
-        distribution="Normal",
-        step_upd="half",
+        distribution:Literal['Uniform', 'Normal']='Normal',
+        step_upd: Literal['half', 'inv', 'inv_sqrt']="half",
         theta=0.6,
         T_half=10,
     ):
-        """Two-step random search. 
+        """Two-step random search.
         '''
         Similar to the STP method [6], but we alternate
-        between two perturbation magnitudes: σ1 is set to be optimal for the large gradient case, while σ2 optimal to
+        between two perturbation magnitudes: sigma1 is set to be optimal for the large gradient case, while sigma2 optimal to
         escape saddles.
         '''
 
         :param a_init: Initial step size, defaults to 0.25
         :param sigma_1: First sigma, defaults to 0.5
         :param sigma_2: Second sigma, defaults to 0.25
-        :param distribution: _description_, defaults to "Normal"
-        :param step_upd: _description_, defaults to "half"
-        :param theta: _description_, defaults to 0.6
-        :param T_half: _description_, defaults to 10
+        :param distribution: Random petrubation distribution, "Normal" or "Uniform", defaults to "Normal"
+        :param step_upd: Step update rule, defaults to "half"
+        :param theta: Multiplier to step size on every `T_half` steps if `step_upd = "half"`, defaults to 0.6
+        :param T_half: Multiply step size by `theta` every `T_half` steps if `step_upd = "half"`, defaults to 10
         """
         super().__init__()
         self.a = a_init
