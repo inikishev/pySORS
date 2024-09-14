@@ -6,10 +6,11 @@ Fork of https://github.com/adamsolomou/second-order-random-search, which impleme
 This fork implements a scipy.minimize-like interface for those methods.
 
 # Installation
-This is available on pip - https://pypi.org/project/pysors/
+https://pypi.org/project/pysors/
 ```
 pip install pysors
 ```
+If you are using conda, the only dependency this has is numpy, so you can safely install this with pip without messing up your conda environment.
 
 # Usage
 ```py
