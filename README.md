@@ -5,6 +5,12 @@ Fork of https://github.com/adamsolomou/second-order-random-search, which impleme
 
 This fork implements a scipy.minimize-like interface for those methods.
 
+# Installation
+This is available on pip - https://pypi.org/project/pysors/
+```
+pip install pysors
+```
+
 # Usage
 ```py
 import pysors
