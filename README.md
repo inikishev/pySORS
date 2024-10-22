@@ -3,7 +3,7 @@
 Fork of https://github.com/adamsolomou/second-order-random-search, which implements algorithms described in:
 > Aurelien Lucchi, Antonio Orvieto, Adamos Solomou. [On the Second-order Convergence Properties of Random Search Methods](https://arxiv.org/abs/2110.13265). In Neural Information Processing Systems (NeurIPS), 2021.
 
-This fork implements a scipy.minimize-like interface for those methods.
+This fork implements a scipy.minimize-like interface for those methods. They have a lot of hyperparameters though, and I just copied them from the original repo. In particular step size tends to decay very quickly. Therefore this is not that useful for black box optimization unless you do a lot of careful hyperparameters tuning, which I might do at some point on some diverse set of problems.
 
 # Installation
 https://pypi.org/project/pysors/
